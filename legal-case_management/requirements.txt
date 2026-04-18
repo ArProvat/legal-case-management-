@@ -1,1 +1,12 @@
-# Python dependencies
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+openai
+langchain
+langchain-openai
+langchain-chroma
+chromadb
+python-multipart
+python-dotenv
+httpx

@@ -1,1 +1,35 @@
-# Docker configuration
+FROM python:3.12-slim As builder
+
+WORKDIR /app
+
+RUN sed -i 's/ main$/ main contrib non-free non-free-firmware/' /etc/apt/sources.list.d/debian.sources && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends build-essential ffmpeg ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+FROM python:3.12-slim
+
+RUN sed -i 's/ main$/ main contrib non-free non-free-firmware/' /etc/apt/sources.list.d/debian.sources && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends build-essential ffmpeg ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 1. Copy the library files (You already have this)
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+
+# 2. ADD THIS LINE: Copy the executables (uvicorn, etc.)
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+COPY . .
+
+EXPOSE 8888
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8888", "--reload"]
