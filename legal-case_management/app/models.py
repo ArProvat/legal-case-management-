@@ -85,3 +85,15 @@ class StructuredExtraction(BaseModel):
     ownership: Optional[OwnershipRecord] = None
     other_facts: list[str] = Field(default_factory=list)
 
+class ProcessRequest(BaseModel):
+    case_number: str = "2025-FC-08891"
+    data_dir: Optional[str] = None
+
+class CaseData(BaseModel):
+    case_number: str
+    borrower: str
+    property_address: str
+    county: str
+    state: str
+    documents: list[ProcessedDocument] = Field(default_factory=list)
+    extractions: list[StructuredExtraction] = Field(default_factory=list)
